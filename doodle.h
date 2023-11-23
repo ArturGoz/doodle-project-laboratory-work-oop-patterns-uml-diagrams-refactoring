@@ -467,17 +467,33 @@ public:
             gameover = false;
         }
     }
+    void SetI(int num)
+    {
+        i = num;
+    }
+    void SetSBOMB()
+    {
+        sBomb.setPosition(-100,-100);
+    }
+
 private:
     int i;
     int dx;
     Sprite& sBomb; // Ссылка на объект Sprite
 };
 
-void ResetGame(int size,bool& ifgameover,TextureManager& textureManager, HardLevel& hardLevel, MediumLevel& mediumLevel, EasyLevel& easyLevel, Level& level, Game& game, Platform& Green_Platform, WhitePlatform& White_Platform, MovingPlatform& Blue_Platform, ExtremePlatform& YellowPlatform, Score& sc, Sprite score[], bool& gameover) {
+void ResetGame(traps& trap, int size,bool& ifgameover,TextureManager& textureManager, HardLevel& hardLevel, MediumLevel& mediumLevel, EasyLevel& easyLevel, Level& level, Game& game, Platform& Green_Platform, WhitePlatform& White_Platform, MovingPlatform& Blue_Platform, ExtremePlatform& YellowPlatform, Score& sc, Sprite score[], bool& gameover) {
     game.x = 100;
     game.y = 100;
     game.h = 200;
     game.dy = 0;
+
+  trap.dy = 2.5;
+   trap.y = -1;
+  trap.SetI(1);
+   trap.x = 200;
+  trap.SetSBOMB();
+
 
     Green_Platform.clearPlatforms();
     White_Platform.clearPlatforms();
@@ -503,7 +519,10 @@ void ResetGame(int size,bool& ifgameover,TextureManager& textureManager, HardLev
     else if (level.GetLevel() == "ha") {
         hardLevel.playLevel(Blue_Platform, White_Platform, Green_Platform, YellowPlatform);
         for (int i =0; i< size;++i)
+        {
+        White_Platform.settakenWhitePlatforms(i, false);
         YellowPlatform.settakenWhitePlatforms(i, false);
+        }
     }
 
     sc.SetFS(0, 0);
@@ -573,7 +592,7 @@ void RunGame (bool& controller,QWidget* parent,Music &music, TextureManager& tex
         }
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::F2)) {
-           ResetGame(Size,ifgameover,textureManager, hardLevel, mediumLevel, easyLevel, level, game, Green_Platform, White_Platform, Blue_Platform, YellowPlatform,sc, score,gameover);
+           ResetGame(bomb,Size,ifgameover,textureManager, hardLevel, mediumLevel, easyLevel, level, game, Green_Platform, White_Platform, Blue_Platform, YellowPlatform,sc, score,gameover);
         }
 
 
