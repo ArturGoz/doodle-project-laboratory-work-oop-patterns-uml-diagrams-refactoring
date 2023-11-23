@@ -178,8 +178,7 @@ WhitePlatform :: TouchToPlatform(int x, int y, float& dy, int index) override т
 Усі функції та поля  я не перераховував, можете самі побачити у коді що там їх багато.
 
 проект лаба 2
-відео
-https://youtu.be/dOdLyTJIYAg
+відео https://youtu.be/dOdLyTJIYAg
 
 
 
