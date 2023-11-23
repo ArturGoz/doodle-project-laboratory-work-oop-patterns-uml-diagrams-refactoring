@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 11.0.3, 2023-11-22T15:36:38. -->
+<!-- Written by QtCreator 11.0.3, 2023-11-23T12:38:57. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -241,8 +241,9 @@
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
     <value type="bool" key="PE.EnvironmentAspect.PrintOnRun">false</value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:C:/Users/artur/OneDrive/Документи/laba/laba.pro</value>
-    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">C:/Users/artur/OneDrive/Документи/laba/laba.pro</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">laba2</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:C:/Users/artur/OneDrive/Документи/doodle-project-and-laba-1-laba-2-laba3/laba.pro</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">C:/Users/artur/OneDrive/Документи/doodle-project-and-laba-1-laba-2-laba3/laba.pro</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseLibrarySearchPath">true</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>

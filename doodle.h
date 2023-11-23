@@ -72,7 +72,7 @@ public:
         plat.clear();
     }
 
-
+// рухаю платформи у верх та змінюю текстури у рахуноку
     void movePlatforms(float dy, int& y, int& h, Sprite score[], int fs[], int& sc) {
         for (size_t i = 0; i < plat.size(); ++i) {
             y = h;
@@ -136,7 +136,7 @@ public:
     void setPlatformY(int index, float y) {
             plat[index].y = y;
     }
-
+// прижок вверх
     virtual void TouchToPlatform(int x, int y, float& dy, int index)
     {
         if ((x + 50 > getPlatformX(index)) && (x + 20 < getPlatformX(index) + 68) && (y + 70 > getPlatformY(index)) && (y + 70 < getPlatformY(index) + 14) && (dy > 0))
@@ -168,7 +168,7 @@ public:
 
 
 
-
+// такі є самі функції як і в platform тільки додав перевірку на доторкання до платформи
     void movePlatforms(float dy, int& y,Sprite score[], int fs[], int& sc)  {
         for (size_t i = 0; i < plat.size(); ++i) {
             y = 200;

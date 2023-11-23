@@ -7,10 +7,6 @@ settings::settings(QWidget *parent) :
     ui(new Ui::settings)
 {
     ui->setupUi(this);
-
-    // конекчу свої функції з радіобатонами
-    connect(ui->radioButton, SIGNAL(clicked()), this, SLOT(on_radioButton_clicked()));
-    connect(ui->radioButton_2, SIGNAL(clicked()), this, SLOT(on_radioButton_2_clicked()));
     // створюю QButtonGroup щоб мати 1 властивість з 3 або 2 і тд
     QButtonGroup *skinButtonGroup = new QButtonGroup(this);
     skinButtonGroup->addButton(ui->radioButton_3);
@@ -37,20 +33,6 @@ settings::~settings()
 }
 
 
-void settings::on_radioButton_clicked()
-{
-    ui->radioButton_2->setChecked(false);
-    ui->radioButton->setChecked(true);
-   // controller23 = ui->radioButton_2->isChecked();
-    // Додайте код для включення першого радіобатона
-}
-
-void settings::on_radioButton_2_clicked()
-{
-    ui->radioButton_2->setChecked(true);
-    ui->radioButton->setChecked(false);
-
-}
 QRadioButton* settings::getRadioButton() const {
     return ui->radioButton;
 }

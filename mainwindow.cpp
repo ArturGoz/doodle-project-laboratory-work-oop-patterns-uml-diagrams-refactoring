@@ -149,6 +149,7 @@ void MainWindow::starthardGame(){
 }
 
 // функція яка співпрацює з налаштуванням і присвоює нам дані які ми вибрали
+// натискаємо на кнопку Параметрів
 void MainWindow::on_pushButton_2_clicked()
 {
       hide();
@@ -164,6 +165,8 @@ void MainWindow::on_pushButton_2_clicked()
       QRadioButton* radioButtonInSettings_6 = window.getRadioButton6();
       QRadioButton* radioButtonInSettings_7 = window.getRadioButton7();
       QRadioButton* radioButtonInSettings_8 = window.getRadioButton8();
+      \
+// загальні перевірки що ми обрали в параметрах і змінюває наші змінні
 
       if (!controller) radioButtonInSettings->setChecked(true);
       else radioButtonInSettings_2->setChecked(true);
@@ -194,7 +197,7 @@ void MainWindow::on_pushButton_2_clicked()
       show();
 }
 
-
+// натискаємо на кнопку tutorial
 void MainWindow::on_pushButton_6_clicked()
 {
       hide();

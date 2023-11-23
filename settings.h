@@ -30,8 +30,6 @@ public:
 
 public slots:
 
-    void on_radioButton_clicked();
-    void on_radioButton_2_clicked();
 
 private slots:
 
@@ -39,9 +37,7 @@ private slots:
 
 private:
    // Ui::settings *ui;
-  //   QButtonGroup *movementButtonGroup;
-  //  QButtonGroup *skinButtonGroup;
-  //  QButtonGroup *backgroundButtonGroup;
+
 
 
 
