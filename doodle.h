@@ -341,10 +341,6 @@ private:
 class Level
 {
 public:
-  //  Level()
-  //  {
-  //      SetLevel();
- //   }
     void SetLevel(std::string levelofgame)
     {
         level = levelofgame;
