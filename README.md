@@ -179,6 +179,7 @@ WhitePlatform :: TouchToPlatform(int x, int y, float& dy, int index) override т
 
 проект лаба 2
 відео https://youtu.be/dOdLyTJIYAg
+вибачаюсь за погану якість, незнаю як підкращити
 
 
 
