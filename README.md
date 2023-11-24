@@ -171,7 +171,7 @@ https://github.com/ArturGoz/doodle.git тут я робив 1 лабу(а це �
 class ExtremePlatform :  public WhitePlatform, public MovingPlatform наслідує 3 платформи (3-не успадкування ) так як WhitePlatform і MovingPlatform наслідують Platform
 
 // 5.  WhitePlatform ::  movePlatforms(float dy, int& y,Sprite score[], int fs[], int& sc) -> статичний поліморфізм,
-перезагрузка -> немає h як у Platform ::movePlatforms,  
+перезагрузка -> немає h як у Platform ::movePlatforms(float dy, int& y, int& h, Sprite score[], int fs[], int& sc),  
 WhitePlatform :: TouchToPlatform(int x, int y, float& dy, int index) override та  MovingPlatform : createPlatform(int count) override динамічні полімофізми
  6. інкапсуляцію старався реалізувати правильно
  7. Контейнер маю у вигляді вектора  std::vector<Vector2f> plat;
