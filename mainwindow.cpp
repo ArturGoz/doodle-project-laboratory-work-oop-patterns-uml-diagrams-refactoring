@@ -2,7 +2,6 @@
 #include "ui_mainwindow.h"
 #include "doodle.h"
 #include  "settings.h"
-
 #include  "tutorial.h"
 
 
@@ -24,104 +23,21 @@ MainWindow::~MainWindow()
 }
 // функція яка запускає нашу гру
 void MainWindow::startDoodleGame(const std::string& mylevel){
-    srand(time(0));
-    Music music;
- //загружаємо музику
-    if (!music.openFromFile("C:/Users/artur/Downloads/Fluffing-a-Duck(chosic.com).ogg")) {
-        QMessageBox::critical(this,"warning","!music");
-    }
+
 // створюємо наше вікно
-    RenderWindow app(VideoMode(400, 533), "MyDoodleGame");
+    RenderWindow app(VideoMode(Width_of_screen, Height_of_screen), "MyDoodleGame");
 // максимальний фпс
     app.setFramerateLimit(60);
-    Level level;
+    CreateGame game(skinchange,backgroundchange,mylevel);
 
-
-    TextureManager textureManager;
-
-    BasicMechanics mech;
-
-
-// створюємо наші текстури
-    Sprite sBackground,
-        sPlat(textureManager.getTexture(1)),
-        sPers,
-        sWhitePlat(textureManager.getTexture(3)),
-        sBluePlatfrom(textureManager.getTexture(4)),
-        sGameOver(textureManager.getTexture(6)),
-        sBomb(textureManager.getTexture(7)),
-        sYellowPlatform(textureManager.getTexture(8));
-
-// перевірка що ми обрали в параметрах
-    if (skinchange == "ninja") sPers.setTexture(textureManager.getTexture(2));
-    else if(skinchange == "bunny") sPers.setTexture(textureManager.getTexture(9));
-    else sPers.setTexture(textureManager.getTexture(10));
-// перевірка що ми обрали в параметрах
-    if (backgroundchange == "default") sBackground.setTexture(textureManager.getTexture(0));
-    else if(backgroundchange == "ua") sBackground.setTexture(textureManager.getTexture(11));
-    else sBackground.setTexture(textureManager.getTexture(12));
-// зменшуємо в мастабі нашу бомбу
-    sBomb.setScale(15.0f / sBomb.getLocalBounds().width, 15.0f / sBomb.getLocalBounds().height);
-
-
-
-
-// координуємо нашу текстуру геймовер
-    sGameOver.setPosition(0, 150);
-
-
-
-    Game game;
-
-    traps bomb(sBomb);
-
-    EasyLevel easyLevel;
-    MediumLevel mediumLevel;
-    HardLevel hardLevel;
-
-    WhitePlatform White_Platform;
-    Platform Green_Platform;
-    MovingPlatform Blue_Platform;
-    ExtremePlatform YellowPlatform;
-
-
-    Score sc;
-    Sprite score[5];
-
-// настроюємо наш score
-    for (int i = 0; i < 5; i++) {
-        score[i].setTexture(textureManager.getTexture(5));
-        score[i].setTextureRect(IntRect(0, 0, 30, 47));
-        score[i].setPosition(35 * i, 0);
-        sc.SetFS(i,0);
-    }
-
-    level.SetLevel(mylevel);
-
-// перевірка на який ми рівень потряпляємо
-
-    if (level.GetLevel() == "e") {
-        easyLevel.playLevel(Green_Platform);
-    }
-    else if (level.GetLevel() == "m") {
-        mediumLevel.playLevel(Green_Platform, White_Platform);
-    }
-    else if (level.GetLevel() == "ha") {
-        hardLevel.playLevel(Blue_Platform, White_Platform, Green_Platform, YellowPlatform);
-    }
-
-    int Size = Green_Platform.Size();
-
-
-// запускаємо нашу гру
-    RunGame(controller,this,music,textureManager ,hardLevel, mediumLevel, easyLevel, app, game, bomb, level, Green_Platform, White_Platform, Blue_Platform, YellowPlatform, sc, score, sGameOver, sBomb, sBackground, sPlat, sPers, sWhitePlat, sBluePlatfrom, sYellowPlatform, mech, Size, true);
+    game.RunGame(controller,this,app,true);
 
     // присвоюємо наш найкращий результат
-    if(thebestscore < sc.GetCurrentScore()) thebestscore = sc.GetCurrentScore();
+   if(thebestscore < game.getCurrentScore()) thebestscore = game.getCurrentScore();
 
     // перетворюємо з int -> string
 
-    std::string convert = std::to_string(sc.GetCurrentScore()); // Convert integer to string
+    std::string convert = std::to_string(game.getCurrentScore()); // Convert integer to string
     QString qSt = QString::fromStdString(convert);
     ui->label_4->setText(qSt);
 
@@ -206,6 +122,7 @@ void MainWindow::on_pushButton_6_clicked()
       window.exec();
       show();
 }
+
 bool  MainWindow::GetController()
 {
       return controller;

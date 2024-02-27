@@ -14,10 +14,7 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow(QWidget *parent = nullptr);
-    bool controller = true;
-    QString skinchange = "ninja";
-    QString backgroundchange = "default";
-    int thebestscore = 0;
+
     ~MainWindow();
 
 public slots:
@@ -32,6 +29,10 @@ private slots:
     void on_pushButton_6_clicked();
 
 private:
+    bool controller = true;
+    QString skinchange = "ninja";
+    QString backgroundchange = "default";
+    int thebestscore = 0;
     Ui::MainWindow *ui;
 
 };

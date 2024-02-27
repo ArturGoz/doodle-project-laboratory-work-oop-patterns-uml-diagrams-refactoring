@@ -14,7 +14,6 @@ class settings : public QDialog
     Q_OBJECT
 
 public:
-
     explicit settings(QWidget *parent = nullptr);
     Ui::settings* ui;
     QRadioButton* getRadioButton() const;

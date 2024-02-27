@@ -11,15 +11,25 @@
 #include <string>
 #include "QMessageBox"
 #include <QString>
+#define Width_of_screen 400
+#define Height_of_screen 533
 
 using namespace sf;
 
-
-class Game {
+class coordinates
+{
 public:
     int x, y, h;
     float dx, dy;
-    Game() {
+};
+
+
+class Doodle_mech : public coordinates
+{
+
+public:
+    Doodle_mech() {
+        // doodle start
         x = 100;
         y = 100;
         h = 200;
@@ -27,11 +37,7 @@ public:
         dy = 0;
 
     }
-};
 
-class BasicMechanics
-{
-public:
     void TurnDown(float& dy, int& y)
     {
         dy += 0.2;
@@ -39,14 +45,14 @@ public:
     }
     void Teleport(int& x)
     {
-        if (x > 400)
+        if (x > Width_of_screen)
             x = -40;
         if (x < -40)
-            x = 400;
+            x = Width_of_screen;
     }
     void Fall(bool& gameover, int y, int score, float& dy)
     {
-        if (y > 520)
+        if (y > Height_of_screen-13)
         {
             if (score != 0)
                 gameover = false;
@@ -57,9 +63,51 @@ public:
 
 };
 
-class Platform {
+class Abstract_platform
+{
 public:
-    virtual void createPlatform(int count) {
+    void clearPlatforms() {
+        plat.clear();
+    }
+    void drawPlatforms(RenderWindow& app, Sprite& sPlat) {
+        for (size_t i = 0; i < plat.size(); ++i) {
+            sPlat.setPosition(plat[i]);
+            app.draw(sPlat);
+        }
+    }
+
+    float getPlatformX(int index) {
+        return plat[index].x;
+    }
+
+    float getPlatformY(int index) {
+        return plat[index].y;
+    }
+
+    void setPlatformX(int index, float x) {
+        plat[index].x = x;
+    }
+
+    void setPlatformY(int index, float y) {
+        plat[index].y = y;
+    }
+    int Size()
+    {
+        return plat.size();
+    }
+
+    virtual void createPlatform(int count) = 0;
+    virtual void movePlatforms(float dy, int& y, int& h, Sprite score[], int fs[], int& sc) = 0;
+    virtual void TouchToPlatform(int x, int y, float& dy, int index) = 0;
+
+protected:
+    std::vector<Vector2f> plat;
+
+};
+
+class Platform : public Abstract_platform{
+public:
+  virtual  void createPlatform(int count) override{
         for (int i = 0; i < count; ++i) {
             Vector2f p;
             p.x = rand() % 400;
@@ -67,21 +115,15 @@ public:
             plat.push_back(p);
         }
     }
-
-    void clearPlatforms() {
-        plat.clear();
-    }
-
-// рухаю платформи у верх та змінюю текстури у рахуноку
-    void movePlatforms(float dy, int& y, int& h, Sprite score[], int fs[], int& sc) {
+    void movePlatforms(float dy, int& y, int& h, Sprite score[], int fs[], int& sc) override {
         for (size_t i = 0; i < plat.size(); ++i) {
             y = h;
             plat[i].y = plat[i].y + dy;
-            if (plat[i].y > 533) {
+            if (plat[i].y > Height_of_screen) {
                 plat[i].y = 0;
-                plat[i].x = rand() % 400;
+                plat[i].x = rand() % Width_of_screen;
                 ++sc;
-
+                 // structure score numbers
                 fs[4]++;
                 if (fs[4] > 9) {
                     fs[4] -= 10;
@@ -114,45 +156,14 @@ public:
         }
     }
 
-    void drawPlatforms(RenderWindow& app, Sprite& sPlat) {
-        for (size_t i = 0; i < plat.size(); ++i) {
-            sPlat.setPosition(plat[i]);
-            app.draw(sPlat);
-        }
-    }
-
-    float getPlatformX(int index) {    
-            return plat[index].x;     
-    }
-
-    float getPlatformY(int index) {     
-            return plat[index].y;
-    }
-
-    void setPlatformX(int index, float x) {
-            plat[index].x = x;
-    }
-
-    void setPlatformY(int index, float y) {
-            plat[index].y = y;
-    }
-// прижок вверх
-    virtual void TouchToPlatform(int x, int y, float& dy, int index)
+  virtual  void TouchToPlatform(int x, int y, float& dy, int index) override
     {
+        // width and height of platform // jump on them
         if ((x + 50 > getPlatformX(index)) && (x + 20 < getPlatformX(index) + 68) && (y + 70 > getPlatformY(index)) && (y + 70 < getPlatformY(index) + 14) && (dy > 0))
         {
             dy = -10;
         }
     }
-    int Size()
-    {
-        return plat.size();
-    }
-
-
-
-protected:
-    std::vector<Vector2f> plat;
 
 };
 
@@ -173,12 +184,12 @@ public:
         for (size_t i = 0; i < plat.size(); ++i) {
             y = 200;
             plat[i].y = plat[i].y + dy;
-            if (plat[i].y > 533) {
+            if (plat[i].y > Height_of_screen) {
                 if (gettakenWhitePlatforms(i))
                     settakenWhitePlatforms(i, false);
                 sc++;
                 plat[i].y = 0;
-                plat[i].x = rand() % 400;
+                plat[i].x = rand() % Width_of_screen;
 
                 fs[4]++;
                 if (fs[4] > 9) {
@@ -289,16 +300,14 @@ public:
     void createPlatform(int count) override {
         for (int i = 0; i < count; ++i) {
             Vector2f p;
-            p.x = rand() % 400;
-            p.y = rand() % 533;
+            p.x = rand() % Width_of_screen;
+            p.y = rand() % Height_of_screen;
             int move;
             move = rand() % 2 == 0 ? -1 : 1;
             direction.push_back(move);
             plat.push_back(p);
         }
     }
-
-
 
     void update() {
         for (size_t i = 0; i < plat.size(); ++i) {
@@ -337,54 +346,60 @@ private:
 
 };
 
-
-class Level
+class All_levels
 {
 public:
-    void SetLevel(std::string levelofgame)
-    {
-        level = levelofgame;
-    }
-
     std::string GetLevel()
     {
         return level;
     }
+    void SetLevel(std::string levelofgame,MovingPlatform& Blue_Platform, WhitePlatform& White_Platform, Platform& Green_Platform, ExtremePlatform& Yellow_Platfrom)
+    {
+        level = levelofgame;
 
+        if (level == "e") {
+            Green_Platform.createPlatform(10);
+        }
+        else if (level == "m") {
+            Green_Platform.createPlatform(5);
+            White_Platform.createPlatform(5);
+        }
+        else if (level == "ha") {
+            Green_Platform.createPlatform(2);
+            White_Platform.createPlatform(2);
+            Blue_Platform.createPlatform(2);
+            Yellow_Platfrom.createplatform(2);
+        }
+    }
+
+    void Clear_current_level(MovingPlatform& Blue_Platform, WhitePlatform& White_Platform, Platform& Green_Platform, ExtremePlatform& Yellow_Platfrom)
+    {
+        if (level == "e") {
+            Green_Platform.createPlatform(10);
+        }
+        else if (level == "m") {
+            Green_Platform.createPlatform(5);
+            White_Platform.createPlatform(5);
+
+            for (int i =0; i< 5;++i)
+                White_Platform.settakenWhitePlatforms(i, false);
+        }
+        else if (level == "ha") {
+            Green_Platform.createPlatform(2);
+            White_Platform.createPlatform(2);
+            Blue_Platform.createPlatform(2);
+            Yellow_Platfrom.createplatform(2);
+
+            for (int i =0; i< 2;++i)
+            {
+                White_Platform.settakenWhitePlatforms(i, false);
+                Yellow_Platfrom.settakenWhitePlatforms(i, false);
+            }
+        }
+    }
 
 private:
     std::string level;
-};
-
-class EasyLevel
-{
-public:
-    void playLevel(Platform& Green_Platform)
-    {
-        Green_Platform.createPlatform(10);
-    }
-};
-
-class MediumLevel
-{
-public:
-    void playLevel(Platform& Green_Platform, WhitePlatform& White_Platform)
-    {
-        Green_Platform.createPlatform(5);
-        White_Platform.createPlatform(5);
-    }
-};
-
-class HardLevel
-{
-public:
-    void playLevel(MovingPlatform& Blue_Platform, WhitePlatform& White_Platform, Platform& Green_Platform, ExtremePlatform& Yellow_Platfrom)
-    {
-        Green_Platform.createPlatform(2);
-        White_Platform.createPlatform(2);
-        Blue_Platform.createPlatform(2);
-        Yellow_Platfrom.createplatform(2);
-    }
 };
 
 class Score
@@ -413,10 +428,10 @@ private:
     int current_score;
 };
 
-class traps : public Game
+class traps : public coordinates
 {
 public:
-    traps(Sprite& b) : sBomb(b) // Передача по ссылке
+   void constructor(Sprite& sBomb)
     {
         i = 1;
         x = 200;
@@ -425,7 +440,7 @@ public:
         sBomb.setPosition(-100, -100);
     }
 
-    void createBomb(int number)
+    void createBomb(int number,Sprite& sBomb)
     {
         if (number > 50 * i)
         {
@@ -438,7 +453,7 @@ public:
         }
     }
 
-    void down()
+    void down(Sprite& sBomb)
     {
         if (y >= 0)
         {
@@ -452,7 +467,7 @@ public:
         }
 
     }
-    void BOOM(bool& gameover,Sprite sBomb,Sprite sPers)
+    void BOOM(bool& gameover,Sprite sPers,Sprite& sBomb )
     {
         FloatRect bombBounds = sBomb.getGlobalBounds();
         FloatRect doodleBounds = sPers.getGlobalBounds();
@@ -467,29 +482,208 @@ public:
     {
         i = num;
     }
-    void SetSBOMB()
-    {
-        sBomb.setPosition(-100,-100);
-    }
-
 private:
     int i;
-    int dx;
-    Sprite& sBomb; // Ссылка на объект Sprite
+   // Sprite& sBomb; // Ссылка на объект Sprite
 };
 
-void ResetGame(traps& trap, int size,bool& ifgameover,TextureManager& textureManager, HardLevel& hardLevel, MediumLevel& mediumLevel, EasyLevel& easyLevel, Level& level, Game& game, Platform& Green_Platform, WhitePlatform& White_Platform, MovingPlatform& Blue_Platform, ExtremePlatform& YellowPlatform, Score& sc, Sprite score[], bool& gameover) {
-    game.x = 100;
-    game.y = 100;
-    game.h = 200;
-    game.dy = 0;
+class CreateGame
+{
+public:
+    CreateGame(QString& skinchange, QString& backgroundchange, std::string mylevel)
+    {
+        srand(time(0));
 
-  trap.dy = 2.5;
-   trap.y = -1;
-  trap.SetI(1);
-   trap.x = 200;
-  trap.SetSBOMB();
+        if (!music.openFromFile("C:/Users/artur/Downloads/Fluffing-a-Duck(chosic.com).ogg")) {
+          //  QMessageBox::critical(this,"warning","!music");
+        }
+        music.play();
+        music.setLoop(true);
 
+        sPlat = Sprite(textureManager.getTexture(1));
+        sWhitePlat = Sprite(textureManager.getTexture(3));
+        sBluePlatfrom = Sprite(textureManager.getTexture(4));
+        sGameOver = Sprite(textureManager.getTexture(6));
+        sBomb = Sprite(textureManager.getTexture(7));
+        sYellowPlatform = Sprite(textureManager.getTexture(8));
+         bomb.constructor(sBomb);
+        // перевірка що ми обрали в параметрах
+        if (skinchange == "ninja") sPers.setTexture(textureManager.getTexture(2));
+        else if(skinchange == "bunny") sPers.setTexture(textureManager.getTexture(9));
+        else sPers.setTexture(textureManager.getTexture(10));
+        // перевірка що ми обрали в параметрах
+        if (backgroundchange == "default") sBackground.setTexture(textureManager.getTexture(0));
+        else if(backgroundchange == "ua") sBackground.setTexture(textureManager.getTexture(11));
+        else sBackground.setTexture(textureManager.getTexture(12));
+
+        for (int i = 0; i < 5; i++) {
+            score[i].setTexture(textureManager.getTexture(5));
+            score[i].setTextureRect(IntRect(0, 0, 30, 47));
+            score[i].setPosition(35 * i, 0);
+            sc.SetFS(i,0);
+        }
+
+
+        sBomb.setScale(15.0f / sBomb.getLocalBounds().width, 15.0f / sBomb.getLocalBounds().height);
+        sGameOver.setPosition(0, 150);
+        levelset.SetLevel(mylevel,Blue_Platform, White_Platform, Green_Platform, YellowPlatform);
+        Size = Green_Platform.Size();
+
+    }
+    void RunGame (bool& controller,QWidget* parent,RenderWindow& app, bool gameover) {
+
+        bool isTabPressed = false;
+        bool gamePaused = false;
+
+        bool isF1Pressed = false;
+        bool isMusicPlaying =true;
+
+        bool ifgameover = true;
+
+        while (app.isOpen()) {
+            Event e;
+            while (app.pollEvent(e)) {
+        if (e.type == Event::Closed)
+            app.close();
+            }
+
+            app.clear();
+
+            if (Keyboard::isKeyPressed(Keyboard::Escape)) app.close();
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Tab)) {
+             isTabPressed = true;
+            }
+
+            else {
+        // Якщо клавіша "Tab" була відпущена
+        if (isTabPressed) {
+            // Інвертуємо стан гри (пауза/продовження)
+            gamePaused = !gamePaused;
+        }
+        isTabPressed = false;
+            }
+
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::F1) && !isF1Pressed) {
+        isF1Pressed = true;
+
+        // Інвертуємо стан відтворення музики
+        if (isMusicPlaying) {
+            music.stop();
+        }
+        else {
+            music.play();
+        }
+
+        isMusicPlaying = !isMusicPlaying;
+            }
+
+            // Перевірка, чи клавіша "F1" відпущена
+            if (!sf::Keyboard::isKeyPressed(sf::Keyboard::F1)) {
+        isF1Pressed = false;
+            }
+
+           if (sf::Keyboard::isKeyPressed(sf::Keyboard::F2)) {
+        ResetGame(ifgameover,gameover);
+            }
+
+
+
+            if (!gamePaused)
+            {
+        if (gameover)
+        {
+
+            if(controller)
+            {
+                if (Keyboard::isKeyPressed(Keyboard::Right)) doodlick.x += 4;
+                if (Keyboard::isKeyPressed(Keyboard::Left)) doodlick.x -= 4;
+            }
+            else
+            {
+                if (Keyboard::isKeyPressed(Keyboard::D)) doodlick.x += 4;
+                if (Keyboard::isKeyPressed(Keyboard::A)) doodlick.x -= 4;
+            }
+
+            Blue_Platform.update();
+            YellowPlatform.update();
+
+            doodlick.TurnDown(doodlick.dy, doodlick.y);
+
+            doodlick.Teleport(doodlick.x);
+
+            bomb.createBomb(sc.GetCurrentScore(),sBomb);
+
+            bomb.down(sBomb);
+
+            bomb.BOOM(gameover, sPers,sBomb);
+
+            doodlick.Fall(gameover, doodlick.y, sc.GetCurrentScore(), doodlick.dy);
+
+            if (doodlick.y < doodlick.h)
+            {
+                Green_Platform.movePlatforms(-doodlick.dy, doodlick.y, doodlick.h, score, sc.GetFS(), sc.GetCurrentScore());
+                if (levelset.GetLevel() == "m" || levelset.GetLevel() == "ha")
+                            White_Platform.movePlatforms(-doodlick.dy, doodlick.y, score, sc.GetFS(), sc.GetCurrentScore());
+                if (levelset.GetLevel() == "ha")
+                {
+                            Blue_Platform.movePlatforms(-doodlick.dy, doodlick.y, doodlick.h, score, sc.GetFS(), sc.GetCurrentScore());
+                            YellowPlatform.moveplatforms(-doodlick.dy, doodlick.y, score, sc.GetFS(), sc.GetCurrentScore());
+                }
+            }
+
+            for (int i = 0; i < Size; ++i)
+            {
+                Green_Platform.TouchToPlatform(doodlick.x, doodlick.y, doodlick.dy, i);
+                if (levelset.GetLevel() == "m" || levelset.GetLevel() == "ha")
+                            White_Platform.TouchToPlatform(doodlick.x, doodlick.y, doodlick.dy, i);
+                if (levelset.GetLevel() == "ha")
+                {
+                            Blue_Platform.TouchToPlatform(doodlick.x, doodlick.y, doodlick.dy, i);
+                            YellowPlatform.TouchToPlatform(doodlick.x, doodlick.y, doodlick.dy, i);
+                }
+            }
+        }
+            }
+
+
+            sPers.setPosition(doodlick.x, doodlick.y);
+
+            app.draw(sBackground);
+            app.draw(sPers);
+
+            Green_Platform.drawPlatforms(app, sPlat);
+            White_Platform.drawPlatforms(app, sWhitePlat);
+            Blue_Platform.drawPlatforms(app, sBluePlatfrom);
+            YellowPlatform.drawplatforms(app, sYellowPlatform);
+
+            app.draw(sBomb);
+
+            for (int i = 0; i < 5; ++i)
+        app.draw(score[i]);
+
+            if (!gameover && ifgameover)
+            {
+        app.draw(sGameOver);
+
+
+        std::string asd = std::to_string(sc.GetCurrentScore()); // Convert integer to string
+        QString qString = QString::fromStdString(asd);
+
+        QMessageBox::about(parent,"  Your score  ", qString);
+        ifgameover = false;
+
+        //   RunGame(music,textureManager,hardLevel, mediumLevel, easyLevel, app, game, bomb, level, Green_Platform, White_Platform, Blue_Platform, YellowPlatform, sc, score, sGameOver, sBomb, sBackground, sPlat, sPers, sWhitePlat, sBluePlatfrom, sYellowPlatform, mech, Size, true);
+
+            }
+
+            app.display();
+        }
+    }
+
+    void ResetGame(bool& ifgameover, bool& gameover) {
+
+    doodlick = Doodle_mech();
+    bomb.constructor(sBomb);
 
     Green_Platform.clearPlatforms();
     White_Platform.clearPlatforms();
@@ -503,7 +697,7 @@ void ResetGame(traps& trap, int size,bool& ifgameover,TextureManager& textureMan
         sc.SetFS(i, 0);
     }
 
-    if (level.GetLevel() == "e") {
+ /*   if (level.GetLevel() == "e") {
         easyLevel.playLevel(Green_Platform);
     }
     else if (level.GetLevel() == "m") {
@@ -519,7 +713,8 @@ void ResetGame(traps& trap, int size,bool& ifgameover,TextureManager& textureMan
         White_Platform.settakenWhitePlatforms(i, false);
         YellowPlatform.settakenWhitePlatforms(i, false);
         }
-    }
+    }*/
+    levelset.Clear_current_level(Blue_Platform, White_Platform, Green_Platform, YellowPlatform);
 
     sc.SetFS(0, 0);
     sc.SetFS(1, 0);
@@ -531,156 +726,27 @@ void ResetGame(traps& trap, int size,bool& ifgameover,TextureManager& textureMan
     ifgameover = true;
 }
 
-void RunGame (bool& controller,QWidget* parent,Music &music, TextureManager& textureManager,HardLevel& hardLevel,MediumLevel& mediumLevel,EasyLevel& easyLevel,RenderWindow& app, Game& game, traps& bomb, Level& level, Platform& Green_Platform, WhitePlatform& White_Platform, MovingPlatform& Blue_Platform, ExtremePlatform& YellowPlatform, Score& sc, Sprite score[], Sprite& sGameOver, Sprite& sBomb, Sprite& sBackground, Sprite& sPlat, Sprite& sPers, Sprite& sWhitePlat, Sprite& sBluePlatfrom, Sprite& sYellowPlatform, BasicMechanics& mech,int& Size, bool gameover) {
 
 
-    music.play();
-    music.setLoop(true);
-
-    bool isTabPressed = false;
-    bool gamePaused = false;
-
-    bool isF1Pressed = false;
-    bool isMusicPlaying =true;
-
-    bool ifgameover = true;
-
-    while (app.isOpen()) {
-        Event e;
-        while (app.pollEvent(e)) {
-            if (e.type == Event::Closed)
-                app.close();
-        }
-
-        app.clear();
-
-        if (Keyboard::isKeyPressed(Keyboard::Escape)) app.close();
-
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Tab)) {
-            isTabPressed = true;
-        }
-        else {
-            // Якщо клавіша "Tab" була відпущена
-            if (isTabPressed) {
-                // Інвертуємо стан гри (пауза/продовження)
-                gamePaused = !gamePaused;
-            }
-            isTabPressed = false;
-        }
-
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::F1) && !isF1Pressed) {
-            isF1Pressed = true;
-
-            // Інвертуємо стан відтворення музики
-            if (isMusicPlaying) {
-                music.stop();
-            }
-            else {
-                music.play();
-            }
-
-            isMusicPlaying = !isMusicPlaying;
-        }
-
-        // Перевірка, чи клавіша "F1" відпущена
-        if (!sf::Keyboard::isKeyPressed(sf::Keyboard::F1)) {
-            isF1Pressed = false;
-        }
-
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::F2)) {
-           ResetGame(bomb,Size,ifgameover,textureManager, hardLevel, mediumLevel, easyLevel, level, game, Green_Platform, White_Platform, Blue_Platform, YellowPlatform,sc, score,gameover);
-        }
-
-
-
-        if (!gamePaused)
-        {
-            if (gameover)
-            {
-
-                if(controller)
-                {
-        if (Keyboard::isKeyPressed(Keyboard::Right)) game.x += 4;
-        if (Keyboard::isKeyPressed(Keyboard::Left)) game.x -= 4;
-                }
-                else
-                {
-        if (Keyboard::isKeyPressed(Keyboard::D)) game.x += 4;
-        if (Keyboard::isKeyPressed(Keyboard::A)) game.x -= 4;
-                }
-
-        Blue_Platform.update();
-        YellowPlatform.update();
-
-        mech.TurnDown(game.dy, game.y);
-
-        mech.Teleport(game.x);
-
-        bomb.createBomb(sc.GetCurrentScore());
-
-        bomb.down();
-
-        bomb.BOOM(gameover, sBomb, sPers);
-
-        mech.Fall(gameover, game.y, sc.GetCurrentScore(), game.dy);
-
-        if (game.y < game.h)
-        {
-            Green_Platform.movePlatforms(-game.dy, game.y, game.h, score, sc.GetFS(), sc.GetCurrentScore());
-            if (level.GetLevel() == "m" || level.GetLevel() == "ha")
-                White_Platform.movePlatforms(-game.dy, game.y, score, sc.GetFS(), sc.GetCurrentScore());
-            if (level.GetLevel() == "ha")
-            {
-                Blue_Platform.movePlatforms(-game.dy, game.y, game.h, score, sc.GetFS(), sc.GetCurrentScore());
-                YellowPlatform.moveplatforms(-game.dy, game.y, score, sc.GetFS(), sc.GetCurrentScore());
-            }
-        }
-
-        for (int i = 0; i < Size; ++i)
-        {
-            Green_Platform.TouchToPlatform(game.x, game.y, game.dy, i);
-            if (level.GetLevel() == "m" || level.GetLevel() == "ha")
-                White_Platform.TouchToPlatform(game.x, game.y, game.dy, i);
-            if (level.GetLevel() == "ha")
-            {
-                Blue_Platform.TouchToPlatform(game.x, game.y, game.dy, i);
-                YellowPlatform.TouchToPlatform(game.x, game.y, game.dy, i);
-            }
-        }
-       }
-      }
-
-
-        sPers.setPosition(game.x, game.y);
-
-        app.draw(sBackground);
-        app.draw(sPers);
-
-        Green_Platform.drawPlatforms(app, sPlat);
-        White_Platform.drawPlatforms(app, sWhitePlat);
-        Blue_Platform.drawPlatforms(app, sBluePlatfrom);
-        YellowPlatform.drawplatforms(app, sYellowPlatform);
-
-        app.draw(sBomb);
-
-        for (int i = 0; i < 5; ++i)
-            app.draw(score[i]);
-
-        if (!gameover and ifgameover)
-        {
-            app.draw(sGameOver);
-
-
-            std::string asd = std::to_string(sc.GetCurrentScore()); // Convert integer to string
-            QString qString = QString::fromStdString(asd);
-
-            QMessageBox::about(parent,"  Your score  ", qString);
-            ifgameover = false;
-
-             //   RunGame(music,textureManager,hardLevel, mediumLevel, easyLevel, app, game, bomb, level, Green_Platform, White_Platform, Blue_Platform, YellowPlatform, sc, score, sGameOver, sBomb, sBackground, sPlat, sPers, sWhitePlat, sBluePlatfrom, sYellowPlatform, mech, Size, true);
-
-        }
-
-        app.display();
+    int getCurrentScore() {
+        return sc.GetCurrentScore();
     }
-}
+
+private:
+    Music music;
+    TextureManager textureManager;
+    All_levels levelset;
+    Doodle_mech doodlick;
+    traps bomb;
+    Platform Green_Platform;
+    WhitePlatform White_Platform;
+    MovingPlatform Blue_Platform;
+    ExtremePlatform YellowPlatform;
+    Score sc;
+    Sprite score[5];
+    Sprite sGameOver; //&
+    Sprite sBomb; Sprite sBackground; Sprite sPlat; Sprite sPers; Sprite sWhitePlat; Sprite sBluePlatfrom; Sprite sYellowPlatform;
+    int Size;
+
+
+};
