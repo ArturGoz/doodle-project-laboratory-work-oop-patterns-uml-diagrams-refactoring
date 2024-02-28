@@ -1,1 +1,19 @@
-123
+1. Використав свій проект з 1 семестру
+2. Мій проект це - гра тому юніт тестів я не робив, бо не можу це створити.
+3. Use Case, Class, Component, Composite Structure, Deployment, Package, Sequence, Activity, State. остальні діаграми я не бачів сенсу роботи(конкретно чому описав у папках uml в read.me файлі)
+4. Змінив структуру коду.
+5. Виконані у коміті refactoring code
+6. Ніяк не змінює логіку програми.
+7. 
+8. Додав абстракний клас Abstract_platform для своїх платформ. Також повидаляв багато однотипних класів та створював загальні(Doodle_mech, All_levels).
+Також відредагував деякі класи один з них class coordinates зробив його більш таким "шаблонним" для інших класів як Doodle_mech traps, які наслідують coordinates.
+Створив клас CreateGame який і реалізовує мою гру. Усі дані які я задавав в методі  MainWindow::startDoodleGame() реалізовуються в конструкторі CreateGame також реалізував в класі
+CreateGame методи як RunGame() and ResetGame() які запускають мою гру.
+Також я додав #define Width_of_screen 400 #define Height_of_screen 533 для кращого уявлення координатів.
+Якщо підсумувати мі й рефакторинг то я зробив його більш читабельним та на мою думку кращим по принципам ООП зробив абстракні класи і тд.
+також змінив метод void RunGame (bool& controller,QWidget* parent,Music &music, TextureManager& textureManager,HardLevel& hardLevel,MediumLevel& mediumLevel,EasyLevel& easyLevel,RenderWindow& app, Game& game, traps& bomb, Level& level, Platform& Green_Platform, WhitePlatform& White_Platform, MovingPlatform& Blue_Platform, ExtremePlatform& YellowPlatform, Score& sc, Sprite score[], Sprite& sGameOver, Sprite& sBomb, Sprite& sBackground, Sprite& sPlat, Sprite& sPers, Sprite& sWhitePlat, Sprite& sBluePlatfrom, Sprite& sYellowPlatform, BasicMechanics& mech,int& Size, bool gameover)
+який мене бісив на більш зручний game.RunGame(controller,this,app,true);
+
+
+
+
