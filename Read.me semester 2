@@ -2,7 +2,7 @@
 2. Мій проект це - гра тому юніт тестів я не робив, бо не можу це створити.
 3. Use Case, Class, Component, Composite Structure, Deployment, Package, Sequence, Activity, State. остальні діаграми я не бачів сенсу роботи(конкретно чому описав у папках uml в read.me файлі)
 4. Змінив структуру коду.
-5. Виконані у коміті refactoring code
+5. Виконані у коміті refactoring code ссилка (https://github.com/ArturGoz/doodle-project-and-laba-1-laba-2-laba3/commit/7cc47808a05e8c7c03e38a2b47a70d686dc61cd3)
 6. Ніяк не змінює логіку програми.
 7. 
 8. Додав абстракний клас Abstract_platform для своїх платформ. Також повидаляв багато однотипних класів та створював загальні(Doodle_mech, All_levels).
