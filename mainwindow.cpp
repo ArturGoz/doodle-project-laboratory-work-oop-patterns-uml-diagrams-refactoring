@@ -26,11 +26,18 @@ void MainWindow::startDoodleGame(const std::string& mylevel){
 
 // створюємо наше вікно
     RenderWindow app(VideoMode(Width_of_screen, Height_of_screen), "MyDoodleGame");
-// максимальний фпс
-    app.setFramerateLimit(60);
-    CreateGame game(skinchange,backgroundchange,mylevel);
 
-    game.RunGame(controller,this,app,true);
+
+    // максимальний фпс
+    // використовується патерн Game Loop
+    // обмеження FPS є ключовою частиною патерну “Game Loop”.
+    // становлення максимального FPS допомагає контролювати швидкість, з якою оновлюється стан гри.
+    //Це важливо, оскільки дозволяє гарантувати, що гра працює з постійною швидкістю незалежно від швидкості обробки комп’ютера.
+    app.setFramerateLimit(60);
+
+    CreateGame game(skinchange,backgroundchange,mylevel,app,this);
+// запускаємо нашу гру
+    game.RunGame(controller);
 
     // присвоюємо наш найкращий результат
    if(thebestscore < game.getCurrentScore()) thebestscore = game.getCurrentScore();
@@ -48,6 +55,8 @@ void MainWindow::startDoodleGame(const std::string& mylevel){
      ui->label_5->setText(qSt);
 }
 
+
+// передаємо рівень гри за e -> easy, m -> medium, ha -> hard
 void MainWindow::starteasyGame(){
       hide();
       startDoodleGame("e");
