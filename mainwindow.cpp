@@ -36,8 +36,13 @@ void MainWindow::startDoodleGame(const std::string& mylevel){
     app.setFramerateLimit(60);
 
     CreateGame game(skinchange,backgroundchange,mylevel,app,this);
+    game.testResetGame();
+    game.testResetGameClass();
+    game.testDoAll(); // повинен відразу видаватися наш рахунок
+    game.testRunGame(controller);
 // запускаємо нашу гру
     game.RunGame(controller);
+
 
     // присвоюємо наш найкращий результат
    if(thebestscore < game.getCurrentScore()) thebestscore = game.getCurrentScore();
@@ -80,19 +85,23 @@ void MainWindow::on_pushButton_2_clicked()
       hide();
       settings window;
       window.setModal(true);
-      QRadioButton* radioButtonInSettings = window.getRadioButton();
-      QRadioButton* radioButtonInSettings_2 = window.getRadioButton_2();
 
-      QRadioButton* radioButtonInSettings_3 = window.getRadioButton3();
-      QRadioButton* radioButtonInSettings_4 = window.getRadioButton4();
-      QRadioButton* radioButtonInSettings_5 = window.getRadioButton5();
 
-      QRadioButton* radioButtonInSettings_6 = window.getRadioButton6();
-      QRadioButton* radioButtonInSettings_7 = window.getRadioButton7();
-      QRadioButton* radioButtonInSettings_8 = window.getRadioButton8();
+          QRadioButton* radioButtonInSettings = window.getRadioButton();
+          QRadioButton* radioButtonInSettings_2 = window.getRadioButton_2();
+
+          QRadioButton* radioButtonInSettings_3 = window.getRadioButton3();
+          QRadioButton* radioButtonInSettings_4 = window.getRadioButton4();
+          QRadioButton* radioButtonInSettings_5 = window.getRadioButton5();
+
+          QRadioButton* radioButtonInSettings_6 = window.getRadioButton6();
+          QRadioButton* radioButtonInSettings_7 = window.getRadioButton7();
+          QRadioButton* radioButtonInSettings_8 = window.getRadioButton8();
+
+
       \
-// загальні перевірки що ми обрали в параметрах і змінюває наші змінні
-
+// загальні перевірки що ми обрали в параметрах і змінюває наші параметри
+      std::thread t1([&](){
       if (!controller) radioButtonInSettings->setChecked(true);
       else radioButtonInSettings_2->setChecked(true);
 
@@ -104,7 +113,9 @@ void MainWindow::on_pushButton_2_clicked()
       if (backgroundchange == "default") radioButtonInSettings_6->setChecked(true);
       else if(backgroundchange == "ua") radioButtonInSettings_7->setChecked(true);
       else radioButtonInSettings_8->setChecked(true);
+          });
 
+          t1.join();
 
       window.exec();
 

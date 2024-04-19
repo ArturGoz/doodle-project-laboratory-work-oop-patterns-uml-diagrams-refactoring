@@ -11,6 +11,9 @@
 #include <string>
 #include "QMessageBox"
 #include <QString>
+#include <thread>
+#include <chrono>
+#include <cassert>
 #define Width_of_screen 400
 #define Height_of_screen 533
 
@@ -19,10 +22,12 @@ using namespace sf;
 class CreateGame;
 
 
+
+// клас для координат персонажів
 class coordinates
 {
 public:
-    int x, y, h;
+    float x, y, h;
     float dx, dy;
 };
 
@@ -33,7 +38,7 @@ class Doodle_mech : public coordinates
 
 public:
     Doodle_mech() {
-        // doodle start
+        //позиція старту дудла
         x = 100;
         y = 100;
         h = 200;
@@ -42,13 +47,13 @@ public:
 
     }
 // падіння вниз яке приближує поразку гравця
-    void TurnDown(float& dy, int& y)
+    void TurnDown(float& dy, float& y)
     {
         dy += 0.2;
         y += dy;
     }
 //При перенесенні персонажа за рамки вікна воно телепортує персонажа у протилежну горизонтальну сторону
-    void Teleport(int& x)
+    void Teleport(float& x)
     {
         if (x > Width_of_screen)
             x = -40;
@@ -56,7 +61,7 @@ public:
             x = Width_of_screen;
     }
 //Перевірка падіння граця, якщо гравець перетнув нижнє вікно гри то це призведе до поразки
-    void Fall(bool& gameover, int y, int score, float& dy)
+    void Fall(bool& gameover, float y, float score, float& dy)
     {
         if (y > Height_of_screen-13)
         {
@@ -72,6 +77,8 @@ public:
     }
 
 };
+
+
 
 // клас є абстракним та є використовую патерн “Шаблонний метод”
 //клас Abstract_platform визначає базовий алгоритм у своїх методах createPlatform, movePlatforms та TouchToPlatform.
@@ -128,8 +135,8 @@ public:
     }
 
     virtual void createPlatform(int count) = 0;
-    virtual void movePlatforms(float dy, int& y, int& h, Sprite score[], int fs[], int& sc) = 0;
-    virtual void TouchToPlatform(int x, int y, float& dy, int index) = 0;
+    virtual void movePlatforms(float dy, float& y, float& h, Sprite score[], int fs[], int& sc) = 0;
+    virtual void TouchToPlatform(float x, float y, float& dy, int index) = 0;
 
 protected:
     std::vector<Vector2f> plat;
@@ -150,7 +157,7 @@ public:
         }
     }
     // функціє оновлює мої платформ, якщо платформа є за межами нашого екрану, вона відтворює нову платформу зверху екрана
-    void movePlatforms(float dy, int& y, int& h, Sprite score[], int fs[], int& sc) override {
+    void movePlatforms(float dy, float& y, float& h, Sprite score[], int fs[], int& sc) override {
         for (size_t i = 0; i < plat.size(); ++i) {
             y = h;
             plat[i].y = plat[i].y + dy;
@@ -191,7 +198,7 @@ public:
         }
     }
     // Стрибок по платформам від якої наж персонаж рухається вверх
-    virtual  void TouchToPlatform(int x, int y, float& dy, int index) override
+    virtual  void TouchToPlatform(float x, float y, float& dy, int index) override
     {
         // width and height of platform // jump on them
         if ((x + 50 > getPlatformX(index)) && (x + 20 < getPlatformX(index) + 68) && (y + 70 > getPlatformY(index)) && (y + 70 < getPlatformY(index) + 14) && (dy > 0))
@@ -216,7 +223,7 @@ public:
 
     // функціє оновлює мої платформ, якщо платформа є за межами нашого екрану, вона відтворює нову платформу зверху екрана
     // також функція генерує наш буліан який слідкує чи персонаж вже стрибав на ній, якщо так то платформа не стане функцінувати.
-    void movePlatforms(float dy, int& y,Sprite score[], int fs[], int& sc)  {
+    void movePlatforms(float dy, float& y,Sprite score[], int fs[], int& sc)  {
         for (size_t i = 0; i < plat.size(); ++i) {
             y = 200;
             plat[i].y = plat[i].y + dy;
@@ -260,7 +267,7 @@ public:
     }
 
    // Стрибок по платформам від якої наж персонаж рухається вверх
-    void TouchToPlatform(int x, int y, float& dy, int index) override
+    void TouchToPlatform(float x, float y, float& dy, int index) override
     {
         if ((x + 50 > getPlatformX(index)) && (x + 20 < getPlatformX(index) + 68) && (y + 70 > getPlatformY(index)) && (y + 70 < getPlatformY(index) + 14) && (dy > 0) && !gettakenWhitePlatforms(index))
         {
@@ -278,38 +285,45 @@ protected:
 // клас який генерує усі наші текстури
 class TextureManager {
 public:
-    TextureManager() {
-        LoadTextures();
-    }
 
     Texture& getTexture(int index) {
         return textures[index];
+    }
+
+    void getTextures()
+    {
+        LoadTextures();
     }
 
 private:
     Texture textures[13];
     //функція загружає усі наші платформи
     void LoadTextures() {
-        if (!textures[0].loadFromFile("C:/Users/artur/OneDrive/qttt/pzdc/imgg/background.png"))
-            std::cerr << "Failed to load background.png" << std::endl;
+        //  auto start = std::chrono::high_resolution_clock::now(); // Start timing here
+          std::thread t2([&](){
+            if (!textures[0].loadFromFile("C:/Users/artur/OneDrive/qttt/pzdc/imgg/background.png"))
+                std::cerr << "Failed to load background.png" << std::endl;
 
-        if (!textures[1].loadFromFile("C:/Users/artur/OneDrive/qttt/pzdc/imgg/platform.png"))
-            std::cerr << "Failed to load platform.png" << std::endl;
+            if (!textures[1].loadFromFile("C:/Users/artur/OneDrive/qttt/pzdc/imgg/platform.png"))
+                std::cerr << "Failed to load platform.png" << std::endl;
 
-        if (!textures[2].loadFromFile("C:/Users/artur/OneDrive/qttt/pzdc/imgg/doodle.png"))
-            std::cerr << "Failed to load doodle.png" << std::endl;
+            if (!textures[2].loadFromFile("C:/Users/artur/OneDrive/qttt/pzdc/imgg/doodle.png"))
+                std::cerr << "Failed to load doodle.png" << std::endl;
 
-        if (!textures[3].loadFromFile("C:/Users/artur/OneDrive/qttt/pzdc/imgg/WhitePlatform.png"))
-            std::cerr << "Failed to load WhitePlatform.png" << std::endl;
+            if (!textures[3].loadFromFile("C:/Users/artur/OneDrive/qttt/pzdc/imgg/WhitePlatform.png"))
+                std::cerr << "Failed to load WhitePlatform.png" << std::endl;
 
-        if (!textures[4].loadFromFile("C:/Users/artur/OneDrive/qttt/pzdc/imgg/BluePlatfrom.png"))
-            std::cerr << "Failed to load BluePlatfrom.png" << std::endl;
+            if (!textures[4].loadFromFile("C:/Users/artur/OneDrive/qttt/pzdc/imgg/BluePlatfrom.png"))
+                std::cerr << "Failed to load BluePlatfrom.png" << std::endl;
 
-        if (!textures[5].loadFromFile("C:/Users/artur/OneDrive/qttt/pzdc/imgg/score.png"))
-            std::cerr << "Failed to load score.png" << std::endl;
+            if (!textures[5].loadFromFile("C:/Users/artur/OneDrive/qttt/pzdc/imgg/score.png"))
+                std::cerr << "Failed to load score.png" << std::endl;
 
-        if (!textures[6].loadFromFile("C:/Users/artur/OneDrive/qttt/pzdc/imgg/gameover.png"))
-            std::cerr << "Failed to load gameover.png" << std::endl;
+            if (!textures[6].loadFromFile("C:/Users/artur/OneDrive/qttt/pzdc/imgg/gameover.png"))
+                std::cerr << "Failed to load gameover.png" << std::endl;
+                });
+
+
         if (!textures[7].loadFromFile("C:/Users/artur/OneDrive/qttt/pzdc/imgg/boom.png"))
             std::cerr << "Failed to load boom.png" << std::endl;
         if (!textures[8].loadFromFile("C:/Users/artur/OneDrive/qttt/pzdc/imgg/yellow.png"))
@@ -326,6 +340,12 @@ private:
 
         if (!textures[12].loadFromFile("C:/Users/artur/OneDrive/qttt/pzdc/imgg/fire.jpg"))
             std::cerr << "Failed to load fire.png" << std::endl;
+
+        t2.join();
+       //   auto finish = std::chrono::high_resolution_clock::now(); // End timing here
+
+        //  std::chrono::duration<double> elapsed = finish - start;
+       //   std::cout << "Elapsed time: " << elapsed.count() << " s\n";
     }
 };
 
@@ -379,7 +399,7 @@ public:
         MovingPlatform::createPlatform(count);
     }
 
-    void moveplatforms(float dy, int& y,Sprite score[], int fs[], int& sc) {
+    void moveplatforms(float dy, float& y,Sprite score[], int fs[], int& sc) {
         WhitePlatform::movePlatforms(dy,y,score,fs,sc);
     }
 
@@ -482,13 +502,13 @@ public:
         i = 1;
         x = 200;
         y = -1;
-        dy = 2.5;
+        dy = 2;
         sBomb.setPosition(-100, -100);
     }
     // відтворення бомби
     void createBomb(int number,Sprite& sBomb)
     {
-        if (number > 50 * i)
+        if (number > 30 * i)
         {
 
             ++i;
@@ -499,11 +519,15 @@ public:
         }
     }
    // падіння вниз бомби
-    void down(Sprite& sBomb)
+    void down(Sprite& sBomb, float doodle_dy)
     {
         if (y >= 0)
         {
+            if(doodle_dy < 0)
+            y += 1.35*dy;
+            else
             y += dy;
+
             sBomb.setPosition(dx, y);
         }
         if (y > 533)
@@ -725,7 +749,7 @@ private:
     QWidget* parent;
 };
 
-// MoveStrategy абстракний клас яикй буде використоуватися для патерну "Стратегія"
+// MoveStrategy абстракний клас який буде використоуватися для патерну "Стратегія"
 // Клас CreateGame буде містити cилку на MoveStrategy у вигляді std::unique_ptr<MoveStrategy> strategy;
 //У функції RunGame класу CreateGame має такий код:
 // if (Keyboard::isKeyPressed(Keyboard::Right)) strategy = std::make_unique<MoveRight>();
@@ -763,6 +787,18 @@ public:
     }
 };
 
+class Stay : public MoveStrategy
+{
+public:
+    // рух персонажа вправо
+    void move(Doodle_mech& doodlick) override
+    {
+        doodlick.x += 0;
+    }
+};
+
+
+
 
 // мій основний клас який буде виклакати нашу гру
 //CreateGame агрегує клас InputHandler
@@ -780,40 +816,53 @@ public:
     {
         srand(time(0));
 
-        if (!music.openFromFile("C:/Users/artur/Downloads/Fluffing-a-Duck(chosic.com).ogg")) {
-              QMessageBox::critical(parent1,"warning","!music");
-        }
-        music.play();
-        music.setLoop(true);
 
-        sPlat = Sprite(textureManager.getTexture(1));
-        sWhitePlat = Sprite(textureManager.getTexture(3));
-        sBluePlatfrom = Sprite(textureManager.getTexture(4));
-        sGameOver = Sprite(textureManager.getTexture(6));
-        sBomb = Sprite(textureManager.getTexture(7));
-        sYellowPlatform = Sprite(textureManager.getTexture(8));
-        bomb.constructor(sBomb);
-        // перевірка що ми обрали в параметрах
-        if (skinchange == "ninja") sPers.setTexture(textureManager.getTexture(2));
-        else if(skinchange == "bunny") sPers.setTexture(textureManager.getTexture(9));
-        else sPers.setTexture(textureManager.getTexture(10));
-        // перевірка що ми обрали в параметрах
-        if (backgroundchange == "default") sBackground.setTexture(textureManager.getTexture(0));
-        else if(backgroundchange == "ua") sBackground.setTexture(textureManager.getTexture(11));
-        else sBackground.setTexture(textureManager.getTexture(12));
-        // створення нашого рахунку. вставлення текстур в масиви класу Score
-        for (int i = 0; i < 5; i++) {
-            score[i].setTexture(textureManager.getTexture(5));
-            score[i].setTextureRect(IntRect(0, 0, 30, 47));
-            score[i].setPosition(35 * i, 0);
-            sc.SetFS(i,0);
-        }
+            if (!music.openFromFile("C:/Users/artur/Downloads/Fluffing-a-Duck(chosic.com).ogg")) {
+                QMessageBox::critical(parent1,"warning","!music");
+           }
+            music.play();
+            music.setLoop(true);
 
-        // зміни розмірів бомби
-        sBomb.setScale(15.0f / sBomb.getLocalBounds().width, 15.0f / sBomb.getLocalBounds().height);
-        sGameOver.setPosition(0, 150);
-        levelset.SetLevel(mylevel,Blue_Platform, White_Platform, Green_Platform, YellowPlatform);
-        Size = Green_Platform.Size();
+
+
+
+      //  std::thread t2([&](){
+            textureManager.getTextures();
+                //    });
+            //  t2.join();
+            sPlat = Sprite(textureManager.getTexture(1));
+            sWhitePlat = Sprite(textureManager.getTexture(3));
+            sBluePlatfrom = Sprite(textureManager.getTexture(4));
+            sGameOver = Sprite(textureManager.getTexture(6));
+            sBomb = Sprite(textureManager.getTexture(7));
+            sYellowPlatform = Sprite(textureManager.getTexture(8));
+
+
+
+            bomb.constructor(sBomb);
+             // зміни розмірів бомби
+            sBomb.setScale(15.0f / sBomb.getLocalBounds().width, 15.0f / sBomb.getLocalBounds().height);
+            levelset.SetLevel(mylevel,Blue_Platform, White_Platform, Green_Platform, YellowPlatform);
+             Size = Green_Platform.Size();
+
+
+            // перевірка що ми обрали в параметрах
+            if (skinchange == "ninja") sPers.setTexture(textureManager.getTexture(2));
+            else if(skinchange == "bunny") sPers.setTexture(textureManager.getTexture(9));
+            else sPers.setTexture(textureManager.getTexture(10));
+            // перевірка що ми обрали в параметрах
+            if (backgroundchange == "default") sBackground.setTexture(textureManager.getTexture(0));
+            else if(backgroundchange == "ua") sBackground.setTexture(textureManager.getTexture(11));
+            else sBackground.setTexture(textureManager.getTexture(12));
+            // створення нашого рахунку. вставлення текстур в масиви класу Score
+            for (int i = 0; i < 5; i++) {
+                score[i].setTexture(textureManager.getTexture(5));
+                score[i].setTextureRect(IntRect(0, 0, 30, 47));
+                score[i].setPosition(35 * i, 0);
+                sc.SetFS(i,0);
+            }
+            sGameOver.setPosition(0, 150);
+
         gameover = true;
         isTabPressed = false;
         gamePaused = false;
@@ -831,7 +880,6 @@ public:
 
 
         addObserver(&scoreDisplay);
-
     }
 
     // основна функція яка запускає нашу гру
@@ -841,22 +889,28 @@ public:
 
 
         while (app.isOpen()) {
+
+               auto start = std::chrono::high_resolution_clock::now(); // Start timing here
             Event e;
+
+
             while (app.pollEvent(e)) {
                 if (e.type == Event::Closed)
                     app.close();
             }
-
             app.clear();
 
+          // std::thread tInput([&](){
             inputHandler.handleInput();
+               //   });
+             //   tInput.detach();
 
 
             if (!gamePaused)
             {
                 if (gameover)
                 {
-
+                    std::thread tInput([&](){
                     if (controller)
                     {
                         if (Keyboard::isKeyPressed(Keyboard::Right))
@@ -884,6 +938,8 @@ public:
                     {
                        strategy->move(doodlick);
                     }
+                       });
+
 
                     Blue_Platform.update();
                     YellowPlatform.update();
@@ -894,11 +950,12 @@ public:
 
                     bomb.createBomb(sc.GetCurrentScore(),sBomb);
 
-                    bomb.down(sBomb);
+                    bomb.down(sBomb,doodlick.dy);
 
                     bomb.BOOM(gameover, sPers,sBomb);
 
                     doodlick.Fall(gameover, doodlick.y, sc.GetCurrentScore(), doodlick.dy);
+
 
                     if (doodlick.y < doodlick.h)
                     {
@@ -923,9 +980,13 @@ public:
                             YellowPlatform.TouchToPlatform(doodlick.x, doodlick.y, doodlick.dy, i);
                         }
                     }
+
+                     tInput.join();
+
+
+
                 }
             }
-
 
             sPers.setPosition(doodlick.x, doodlick.y);
 
@@ -953,13 +1014,18 @@ public:
                     Do_All(gameover);
                     ifgameover = false;
                 }
-
             }
 
 
 
+
             app.display();
+              auto finish = std::chrono::high_resolution_clock::now(); // End timing here
+
+              std::chrono::duration<double> elapsed = finish - start;
+               std::cout << "Elapsed time: " << elapsed.count() << " s\n";
         }
+
     }
 
     // функція рестарту
@@ -979,6 +1045,7 @@ public:
             score[i].setPosition(35 * i, 0);
             sc.SetFS(i, 0);
         }
+        strategy = std::make_unique<Stay>();
 
         levelset.Clear_current_level(Blue_Platform, White_Platform, Green_Platform, YellowPlatform);
 
@@ -1035,6 +1102,60 @@ public:
     }
 
 
+    //tests
+    void testResetGame() {
+        // Додавання деяких даних або змін до гри
+        doodlick.x = 500;
+
+
+        // Виклик методу ResetGame
+        ResetGame();
+        // Перевірка, чи гра була скинута до початкового стану
+        assert(doodlick.x == 100);
+        assert(getCurrentScore() == 0);
+        assert(gameover == true);
+    }
+
+    void testResetGameClass() {
+        // Створення об'єкту ResetGameClass
+        ResetGameClass resetGameCommand(*this, isF2Pressed);
+
+        // Зміна стану isF2Pressed, щоб перевірити виконання команди
+        isF2Pressed = false;
+
+        // Виклик методу execute
+        resetGameCommand.execute();
+
+        // Перевірка, чи виконується рестарт гри
+        assert(isF2Pressed == true);
+
+    }
+
+    void testDoAll() {
+        // Виклик методу Do_All, тобто виклик показу рахунку
+        Do_All(false);
+    }
+
+    void testRunGame(bool& controller) {
+        // Створення фіктивних станів для тестування
+        gameover = false;
+        gamePaused = false;
+
+        // Виклик методу RunGame
+        RunGame(controller);
+
+        // Перевірка, чи гра закрита після виклику методу RunGame
+        assert(!app.isOpen());
+
+
+    }
+
+
+
+
+
+
+
 private:
     GamePause gamePause;
     QWidget* parent;
@@ -1069,6 +1190,7 @@ private:
     bool isF2Pressed;
 
     std::unique_ptr<MoveStrategy> strategy;
+
 
 
 
