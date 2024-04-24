@@ -5,6 +5,7 @@ settings::settings(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::settings)
 {
+
     ui->setupUi(this);
     // створюю QButtonGroup щоб мати 1 властивість з 3 або 2 і тд
     QButtonGroup *skinButtonGroup = new QButtonGroup(this);

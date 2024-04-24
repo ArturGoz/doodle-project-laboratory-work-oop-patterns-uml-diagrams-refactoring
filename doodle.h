@@ -14,6 +14,7 @@
 #include <thread>
 #include <chrono>
 #include <cassert>
+#include <mutex>
 #define Width_of_screen 400
 #define Height_of_screen 533
 
@@ -345,7 +346,7 @@ private:
        //   auto finish = std::chrono::high_resolution_clock::now(); // End timing here
 
         //  std::chrono::duration<double> elapsed = finish - start;
-       //   std::cout << "Elapsed time: " << elapsed.count() << " s\n";
+        //  std::cout << "Elapsed time: " << elapsed.count() << " s\n";
     }
 };
 
@@ -758,7 +759,7 @@ private:
 //використання патерну “Стратегія” дозволяє вам легко змінювати напрямок руху героя гри, залежно від того, яку клавішу натиснув користувач.
 //Крім того, це робить код більш чистим та організованим,оскільки логіка кожного напрямку руху ізольована в своєму власному класі.
 
-//Клас MoveStrategy імплементують класи MoveLeft, MoveRight
+//Клас MoveStrategy імплементують класи MoveLeft, MoveRight,Stay
 class MoveStrategy
 {
 public:
@@ -890,7 +891,7 @@ public:
 
         while (app.isOpen()) {
 
-               auto start = std::chrono::high_resolution_clock::now(); // Start timing here
+          //     auto start = std::chrono::high_resolution_clock::now(); // Start timing here
             Event e;
 
 
@@ -1020,10 +1021,10 @@ public:
 
 
             app.display();
-              auto finish = std::chrono::high_resolution_clock::now(); // End timing here
+            //  auto finish = std::chrono::high_resolution_clock::now(); // End timing here
 
-              std::chrono::duration<double> elapsed = finish - start;
-               std::cout << "Elapsed time: " << elapsed.count() << " s\n";
+             // std::chrono::duration<double> elapsed = finish - start;
+             //  std::cout << "Elapsed time: " << elapsed.count() << " s\n";
         }
 
     }

@@ -21,6 +21,9 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+//std::mutex mt;
+
 // функція яка запускає нашу гру
 void MainWindow::startDoodleGame(const std::string& mylevel){
 
@@ -36,10 +39,10 @@ void MainWindow::startDoodleGame(const std::string& mylevel){
     app.setFramerateLimit(60);
 
     CreateGame game(skinchange,backgroundchange,mylevel,app,this);
-    game.testResetGame();
-    game.testResetGameClass();
-    game.testDoAll(); // повинен відразу видаватися наш рахунок
-    game.testRunGame(controller);
+   // game.testResetGame();
+   // game.testResetGameClass();
+   // game.testDoAll(); // повинен відразу видаватися наш рахунок
+  //  game.testRunGame(controller);
 // запускаємо нашу гру
     game.RunGame(controller);
 
@@ -86,7 +89,7 @@ void MainWindow::on_pushButton_2_clicked()
       settings window;
       window.setModal(true);
 
-
+//mt.lock();
           QRadioButton* radioButtonInSettings = window.getRadioButton();
           QRadioButton* radioButtonInSettings_2 = window.getRadioButton_2();
 
@@ -97,11 +100,11 @@ void MainWindow::on_pushButton_2_clicked()
           QRadioButton* radioButtonInSettings_6 = window.getRadioButton6();
           QRadioButton* radioButtonInSettings_7 = window.getRadioButton7();
           QRadioButton* radioButtonInSettings_8 = window.getRadioButton8();
-
-
+//mt.unlock();
       \
 // загальні перевірки що ми обрали в параметрах і змінюває наші параметри
-      std::thread t1([&](){
+ //auto start = std::chrono::high_resolution_clock::now();
+   //   std::thread t1([&](){
       if (!controller) radioButtonInSettings->setChecked(true);
       else radioButtonInSettings_2->setChecked(true);
 
@@ -109,13 +112,17 @@ void MainWindow::on_pushButton_2_clicked()
       if (skinchange == "ninja") radioButtonInSettings_3->setChecked(true);
       else if(skinchange == "bunny") radioButtonInSettings_4->setChecked(true);
       else radioButtonInSettings_5->setChecked(true);
-
+ //});
       if (backgroundchange == "default") radioButtonInSettings_6->setChecked(true);
       else if(backgroundchange == "ua") radioButtonInSettings_7->setChecked(true);
       else radioButtonInSettings_8->setChecked(true);
-          });
 
-          t1.join();
+
+      //    t1.join();
+     // auto finish = std::chrono::high_resolution_clock::now(); // End timing here
+
+    //  std::chrono::duration<double> elapsed = finish - start;
+    //  std::cout << "Elapsed time: " << elapsed.count() << " s\n";
 
       window.exec();
 
@@ -129,6 +136,7 @@ void MainWindow::on_pushButton_2_clicked()
       if(radioButtonInSettings_6->isChecked()) backgroundchange = "default";
       else if (radioButtonInSettings_7->isChecked()) backgroundchange = "ua";
       else backgroundchange = "fire";
+
 
       show();
 }
